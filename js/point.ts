@@ -1,4 +1,4 @@
-class Point {
+class Point implements Hashable {
 	public readonly x: number;
 	public readonly y: number;
 	
@@ -11,7 +11,7 @@ class Point {
 		return this.x === p.x && this.y === p.y;
 	}
 	
-	public toHash(): string {
+	public toString(): string {
 		return this.x + "|" + this.y;
 	}
 }
