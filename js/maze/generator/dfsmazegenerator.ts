@@ -1,46 +1,67 @@
 namespace maze.generator {
-	export class DfsMazeGenerator implements MazeGenerator {
+	export class DfsMazeGenerator implements MazeGenerator, Animatable {
 		private visited = new HashSet<Point>();
 		private stack = new Stack<Point>();
 		private rand: Random = new Random();
+		private maze: Maze;
 
 		public generate(width: number, height: number, start: Point, goal: Point): Maze {
-			let maze = new Maze(width, height, start, goal);
-
-			this.visited.clear();
-			this.stack.clear();
-			this.stack.push(maze.getStart());
+			this.init(width, height, start, goal);
 
 			while (!this.stack.isEmpty()) {
+				this.step();
+			}
+
+			return this.maze;
+		}
+
+		public init(width: number, height: number, start: Point, goal: Point): Maze {
+			this.visited.clear();
+			this.stack.clear();
+			this.stack.push(start);
+			this.maze = new Maze(width, height, start, goal);
+
+			return this.maze;
+		}
+
+		public step(): void {
+			let maze = this.maze,
+				done = false;
+
+			do {
 				let currentPoint = this.stack.peek(),
 					cell = maze.getCellAt(currentPoint);
 
 				this.visited.add(currentPoint);
 
 				if (cell.getType() !== Cell.Type.START && cell.getType() !== Cell.Type.GOAL) {
-					cell.setType(Cell.Type.PATH);
+					maze.setCellType(currentPoint, Cell.Type.PATH);
 				}
 
-				let unvNeighbors = this.unvNeighbors(currentPoint, maze);
+				let unvNeighbors = this.unvNeighbors(currentPoint);
 
 				if (unvNeighbors.length > 0) {
 					let nextPoint = this.chooseUnvNeighbor(unvNeighbors);
-					maze.getCellAt(this.pointBetween(currentPoint, nextPoint)).setType(Cell.Type.PATH);
+					maze.setCellType(this.pointBetween(currentPoint, nextPoint), Cell.Type.PATH);
 					this.stack.push(nextPoint);
+					done = true;
 				} else {
 					this.stack.pop();
 				}
-			}
+			} while (!done && !this.stack.isEmpty());
+		}
 
-			return maze;
+		public isDone(): boolean {
+			return this.stack.isEmpty();
 		}
 
 		private chooseUnvNeighbor(unvNeighbors: Point[]) {
 			return unvNeighbors[this.rand.nextInt(unvNeighbors.length)];
 		}
 
-		private unvNeighbors(p: Point, maze: Maze): Point[] {
-			let neighbors = maze.neighbors(p, 2),
+		private unvNeighbors(p: Point): Point[] {
+			let maze = this.maze,
+				neighbors = maze.neighbors(p, 2),
 				unvNeighbors: Point[] = [];
 
 			for (let elem of neighbors) {

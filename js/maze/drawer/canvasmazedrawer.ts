@@ -15,6 +15,41 @@ namespace maze.drawer {
 			this.context = canvas.getContext("2d");
 		}
 
+		public attach(maze: Maze, scale: number) {
+			let ctx = this.context;
+
+			maze.onChange = (p: Point, typeStr: Cell.Type) => {
+				let imageX = (p.x + 1) * scale,
+					imageY = (p.y + 1) * scale;
+
+				switch (typeStr) {
+					case Cell.Type.WALL:
+						ctx.fillStyle = this.COLOR_WALL;
+						break;
+					case Cell.Type.PATH:
+						ctx.fillStyle = this.COLOR_PATH;
+						break;
+					case Cell.Type.SOLUTION:
+						ctx.fillStyle = this.COLOR_SOLUTION;
+						break;
+					case Cell.Type.HIGHLIGHT:
+						ctx.fillStyle = this.COLOR_HIGHLIGHT;
+						break;
+					case Cell.Type.START:
+						ctx.fillStyle = this.COLOR_START;
+						break;
+					case Cell.Type.GOAL:
+						ctx.fillStyle = this.COLOR_GOAL;
+						break;
+					default:
+						ctx.fillStyle = this.COLOR_ERROR;
+						break;
+				}
+
+				ctx.fillRect(imageX, imageY, scale, scale);
+			};
+		}
+
 		public draw(maze: Maze, scale: number) {
 			let ctx = this.canvas.getContext("2d");
 

@@ -50,6 +50,14 @@ namespace maze {
 			return this.cells[p.y][p.x];
 		}
 
+		public setCellType(p: Point, type: Cell.Type): void {
+			this.cells[p.y][p.x].setType(type);
+			this.onChange(p, type);
+		}
+
+		public onChange(p: Point, type: Cell.Type): void {
+		}
+
 		public neighbors(p: Point, dist: number): Point[] {
 			let result: Point[] = [],
 				a = dist,

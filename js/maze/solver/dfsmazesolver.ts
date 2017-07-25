@@ -1,35 +1,18 @@
 namespace maze.solver {
-	export class DfsMazeSolver implements MazeSolver {
+	export class DfsMazeSolver implements MazeSolver, Animatable {
 		private visited = new HashSet<Point>();
 		private stack = new Stack<Point>();
 		private rand = new Random();
 		private start: Point;
 		private goal: Point;
+		private maze: Maze;
 
 		public solve(maze: Maze): boolean {
-			this.start = maze.getStart();
-			this.goal = maze.getGoal();
-			this.visited.clear();
-			this.stack.clear();
-			this.stack.push(this.start);
+			this.init(maze);
 
 			while (!this.stack.isEmpty()) {
-				let currentPoint = this.stack.peek(),
-					unvNeighbors = this.unvNeighbors(currentPoint, maze);
-
-				this.visited.add(currentPoint);
-
-				if (unvNeighbors.length > 0) {
-					let nextPoint = this.chooseUnvNeighbor(unvNeighbors);
-
-					if (nextPoint.equals(this.goal)) {
-						break;
-					}
-					maze.getCellAt(nextPoint).setType(Cell.Type.SOLUTION);
-					this.stack.push(nextPoint);
-				} else {
-					this.stack.pop();
-					maze.getCellAt(currentPoint).setType(Cell.Type.HIGHLIGHT);
+				if (this.step()) {
+					break;
 				}
 			}
 
@@ -39,12 +22,49 @@ namespace maze.solver {
 
 			while (!this.stack.isEmpty()) {
 				let p = this.stack.pop();
-				maze.getCellAt(p).setType(Cell.Type.SOLUTION);
+				maze.setCellType(p, Cell.Type.SOLUTION);
 			}
 
-			maze.getCellAt(this.start).setType(Cell.Type.START);
+			maze.setCellType(this.start, Cell.Type.START);
 
 			return true;
+		}
+
+		public init(maze: Maze): void {
+			this.start = maze.getStart();
+			this.goal = maze.getGoal();
+			this.visited.clear();
+			this.stack.clear();
+			this.stack.push(this.start);
+			this.maze = maze;
+		}
+
+		public step(): boolean {
+			let maze = this.maze,
+				currentPoint = this.stack.peek(),
+				unvNeighbors = this.unvNeighbors(currentPoint, maze);
+
+			this.visited.add(currentPoint);
+
+			if (unvNeighbors.length > 0) {
+				let nextPoint = this.chooseUnvNeighbor(unvNeighbors);
+
+				if (nextPoint.equals(this.goal)) {
+					return true;
+				}
+
+				maze.setCellType(nextPoint, Cell.Type.SOLUTION);
+				this.stack.push(nextPoint);
+			} else {
+				this.stack.pop();
+				maze.setCellType(currentPoint, Cell.Type.HIGHLIGHT);
+			}
+
+			return false;
+		}
+
+		public isDone(): boolean {
+			return this.stack.isEmpty();
 		}
 
 		private chooseUnvNeighbor(unvNeighbors: Point[]): Point {
