@@ -18,6 +18,7 @@ class Main {
 		canvas.height = (Main.HEIGHT + 2) * Main.SCALE;
 		
 		mazeObj = generator.generate(Main.WIDTH, Main.HEIGHT, Main.START, Main.GOAL);
+		solver.solve(mazeObj);
 		drawer.draw(mazeObj, Main.SCALE);
 	}
 }
