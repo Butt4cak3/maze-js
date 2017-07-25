@@ -4,7 +4,7 @@ namespace maze.drawer {
 		private readonly context: CanvasRenderingContext2D;
 		public COLOR_WALL = "#000000";
 		public COLOR_PATH = "#FFFFFF";
-		public COLOR_SOLUTION = "990000";
+		public COLOR_SOLUTION = "#990000";
 		public COLOR_HIGHLIGHT = "#999999";
 		public COLOR_START = "#00AA00";
 		public COLOR_GOAL = "#FFFF00";
